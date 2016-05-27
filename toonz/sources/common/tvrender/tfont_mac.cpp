@@ -1,6 +1,6 @@
 
 
-#ifndef __LP64__
+#ifdef __LP64__
 
 #include <vector>
 #include <iostream>
@@ -12,6 +12,15 @@
 #include "tcurves.h"
 #include "tconvert.h"
 #include "tvectorimage.h"
+
+#include <QD/ATSUnicodeDirectAccess.h>
+#include <QD/ATSUnicodeFonts.h>
+
+
+typedef signed short S16;
+typedef TINT32 SFIXED;
+#define FixedToInt(a) ((S16)((SFIXED)(a) + 0x8000L >> 16))
+#define Fix2X(a) a+a
 
 using namespace std;
 
@@ -108,9 +117,6 @@ OSStatus MyQuadraticClosePathProc(void *callBackDataPtr)
 
 void GetGlyphIDsAndPositions(ATSUTextLayout iLayout, UniCharArrayOffset iStart, UniCharCount iLength, MyGlyphRecord **oGlyphRecordArray, ItemCount *oNumGlyphs)
 {
-	// This block of code uses the new Direct Access APIs, which are only available on Mac OS X 10.2 and later systems
-	//
-
 	ATSLayoutRecord *layoutRecords;
 	ItemCount numRecords;
 	Fixed *deltaYs;
@@ -354,8 +360,8 @@ void appDrawChar(TRasterGR8P &outImage, TFont::Impl *pimpl, wchar_t charcode)
 								1, &glyphBounds, NULL);
 
 	int height = FixedToInt(glyphBounds.lowerLeft.y) - FixedToInt(glyphBounds.upperLeft.y);
-	int width = tmax(FixedToInt(glyphBounds.lowerRight.x), FixedToInt(glyphBounds.upperRight.x)) -
-				tmin(FixedToInt(glyphBounds.lowerLeft.x), FixedToInt(glyphBounds.upperLeft.x));
+	int width = std::max(FixedToInt(glyphBounds.lowerRight.x), FixedToInt(glyphBounds.upperRight.x)) -
+				std::min(FixedToInt(glyphBounds.lowerLeft.x), FixedToInt(glyphBounds.upperLeft.x));
 
 	outImage = TRasterGR8P(width, height);
 	TPixelGR8 bgp;

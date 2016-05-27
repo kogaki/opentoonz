@@ -30,7 +30,7 @@ class TFont;
 
 //TFont declaration. The class is currently not directly available under 64-bit MAC OSX.
 
-#ifndef __LP64__
+#ifdef __LP64__
 
 #ifdef MACOSX
 #include <ApplicationServices/ApplicationServices.h>
@@ -142,7 +142,7 @@ public:
 
 // --------- TFont methods  called on curren font -----------
 
-#ifndef __LP64__
+#ifdef __LP64__
 
 	TPoint drawChar(TVectorImageP &outImage, wchar_t charcode, wchar_t nextCode = 0)
 	{

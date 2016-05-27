@@ -361,11 +361,15 @@ else()
 
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;colorfx;tnzext;image;sound;toonzqt;tnztools")
 
+    find_library(CARBON_LIB Carbon)
+    find_library(CORE_SERVICE_LIB CoreServices)
+    find_library(QD_LIB NAMES QD PATHS /Volumes/Xcode/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/ApplicationServices.framework/Frameworks)
+#    find_library(QD_LIB NAMES QD)
+    set(SYSTEM_EXTRA_LIBS ${CARBON_LIB} ${CORE_SERVICE_LIB} ${QD_LIB})
+
     # 変なところにライブラリ生成するカスども
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
-
-    target_link_libraries(OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml Qt5::Script Qt5::Widgets Qt5::PrintSupport ${GL_LIB} ${GLUT_LIB} ${COCOA_LIB} ${EXTRA_LIBS})
-
+    target_link_libraries(OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml Qt5::Script Qt5::Widgets Qt5::PrintSupport ${GL_LIB} ${GLUT_LIB} ${COCOA_LIB} ${EXTRA_LIBS} ${SYSTEM_EXTRA_LIBS})
 endif()
 
 if(APPLE)
