@@ -213,7 +213,6 @@ bool TFont::hasVertical() const
 struct TFontManager::Impl {
 	QFontDatabase m_database;
 	bool m_loaded;
-//	ATSUFontID m_currentAtsuFontId;
 	TFont *m_currentFont;
 	QFont *m_currentQFont;
 //	QString m_currentFamily;
@@ -233,49 +232,6 @@ struct TFontManager::Impl {
 
 using namespace std;
 
-//bool TFontManager::Impl::setFontName(ATSUFontID fontId, int platform, int script, int lang)
-//{
-//	ByteCount oActualNameLength;
-//	ItemCount oFontCount;
-//	OSStatus status;
-//
-//	char *buffer = 0;
-//	char *buffer2 = 0;
-//
-//	return false;
-//}
-
-//bool TFontManager::Impl::addFont(ATSUFontID fontId)
-//{
-//	int platform, script, lang;
-//
-//	// per ottimizzare, ciclo solo sui valori
-//	// piu' comuni
-//	for (lang = -1; lang <= 0; lang++)
-//		for (platform = -1; platform <= 1; platform++)
-//			for (script = -1; script <= 0; script++)
-//				if (setFontName(fontId, platform, script, lang))
-//					return true;
-//
-//	//poi li provo tutti
-//	for (lang = -1; lang <= 139; lang++)
-//		for (script = -1; script <= 32; script++)
-//			for (platform = -1; platform <= 4; platform++) {
-//				// escludo quelli nel tri-ciclo for precedente.
-//				// Purtoppo si deve fare cosi:
-//				// non si puo' fare partendo con indici piu' alti nei cicli for!
-//				if (-1 <= lang && lang <= 0 &&
-//					-1 <= script && script <= 0 &&
-//					-1 <= platform && platform <= 1)
-//					continue;
-//
-//				if (setFontName(fontId, platform, script, lang))
-//					return true;
-//			}
-//
-//	return false;
-//}
-
 void TFontManager::Impl::loadFontNames()
 {
 	return;
@@ -289,9 +245,10 @@ bool TFontManager::Impl::setFont(std::wstring family)
 //			m_currentFamily = eachFamily;
 			m_currentQFont = new QFont(eachFamily);
 			m_currentFont = new TFont(m_currentQFont);
-//			for(const QString eachStyle: m_database.styles(eachFamily)){
-//				break;
-//			}
+			for(const QString eachStyle: m_database.styles(eachFamily)){
+				m_currentQFont->setStyleName(eachStyle);
+				break;
+			}
 			break;
 		}
 	}
@@ -332,10 +289,6 @@ void TFontManager::loadFontNames()
 void TFontManager::setFamily(const wstring family)
 {
 	m_pimpl->setFont(family);
-//	if (changed) {
-//		delete m_pimpl->m_currentFont;
-//		m_pimpl->m_currentFont = new TFont(m_pimpl->m_currentAtsuFontId, m_pimpl->m_size);
-//	}
 }
 
 //---------------------------------------------------------
