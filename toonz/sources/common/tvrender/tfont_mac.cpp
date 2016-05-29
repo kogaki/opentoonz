@@ -342,7 +342,7 @@ void TFontManager::setFamily(const wstring family)
 
 void TFontManager::setTypeface(const wstring typeface)
 {
-	return;
+	m_pimpl->m_currentQFont->setStyleName(QString::fromStdWString(typeface));
 }
 
 //---------------------------------------------------------
@@ -362,7 +362,7 @@ wstring TFontManager::getCurrentFamily() const
 
 wstring TFontManager::getCurrentTypeface() const
 {
-	return m_pimpl->m_currentTypeface;
+	return m_pimpl->m_currentQFont->styleName().toStdWString();
 }
 
 //---------------------------------------------------------
