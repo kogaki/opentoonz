@@ -363,9 +363,7 @@ else()
 
     find_library(CARBON_LIB Carbon)
     find_library(CORE_SERVICE_LIB CoreServices)
-    find_library(QD_LIB NAMES QD PATHS /Volumes/Xcode/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/ApplicationServices.framework/Frameworks)
-#    find_library(QD_LIB NAMES QD)
-    set(SYSTEM_EXTRA_LIBS ${CARBON_LIB} ${CORE_SERVICE_LIB} ${QD_LIB})
+    set(SYSTEM_EXTRA_LIBS ${CARBON_LIB} ${CORE_SERVICE_LIB})
 
     # 変なところにライブラリ生成するカスども
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")

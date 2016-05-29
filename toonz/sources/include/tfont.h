@@ -10,6 +10,8 @@
 //STL includes
 #include <string>
 
+#include <QFont>
+
 #undef DVAPI
 #undef DVVAR
 #ifdef TVRENDER_EXPORTS
@@ -53,7 +55,7 @@ private:
 #ifdef _WIN32
 	TFont(const LOGFONTW &, HDC hdc);
 #else
-	TFont(ATSUFontID, int size);
+	TFont(QFont* qfont);
 #endif
 
 public:
