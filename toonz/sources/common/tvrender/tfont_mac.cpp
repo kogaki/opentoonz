@@ -12,12 +12,65 @@
 #include "tcurves.h"
 #include "tconvert.h"
 #include "tvectorimage.h"
+#include "trop.h"
 
 //#include <CoreText/CoreText.h>
 #include <QFont>
 #include <QfontDatabase>
+#include <QPainter>
+#include <QLabel>
+#include <QWidget>
+
 
 using namespace std;
+
+QImage rasterToQImage(const TRasterP &ras, bool premultiplied = true, bool mirrored = true)
+{
+	if (TRaster32P ras32 = ras) {
+		QImage image(ras->getRawData(), ras->getLx(), ras->getLy(),
+					 premultiplied ? QImage::Format_ARGB32_Premultiplied : QImage::Format_ARGB32);
+		if (mirrored)
+			return image.mirrored();
+		return image;
+	} else if (TRasterGR8P ras8 = ras) {
+		QImage image(ras->getRawData(), ras->getLx(), ras->getLy(), ras->getWrap(), QImage::Format_Indexed8);
+		static QVector<QRgb> colorTable;
+		if (colorTable.size() == 0) {
+			int i;
+			for (i = 0; i < 256; i++)
+				colorTable.append(QColor(i, i, i).rgb());
+		}
+		image.setColorTable(colorTable);
+		if (mirrored)
+			return image.mirrored();
+		return image;
+	}
+	return QImage();
+}
+
+//TRaster32P rasterFromQImage(QImage image, bool premultiply = true, bool mirror = true) //no need of const& - Qt uses implicit sharing...
+//{
+//	QImage copyImage = mirror ? image.mirrored() : image;
+//	TRaster32P ras(image.width(), image.height(), image.width(), (TPixelRGBM32 *)copyImage.bits(), false);
+//	if (premultiply)
+//		TRop::premultiply(ras);
+//	return ras->clone();
+//}
+TRasterP rasterFromQImage(const QImage &image) //no need of const& - Qt uses implicit sharing...
+{
+	QImage::Format format = image.format();
+	if (format == QImage::Format_ARGB32 || format == QImage::Format_ARGB32_Premultiplied) {
+		TRaster32P rimage(image.width(), image.height(), image.width(), (TPixelRGBM32 *) image.bits(), false);
+		rimage->addRef();
+		return rimage;
+	}
+	if (format == QImage::Format_Indexed8){
+//		return TRasterGR8P(image.width(), image.height());
+		return TRasterGR8P(image.width(), image.height(), image.bytesPerLine(), (TPixelGR8 *)image.bits(), false);
+	}
+	return TRasterP();
+}
+
 
 struct TFont::Impl {
 	QFont m_qfont;
@@ -66,7 +119,9 @@ TFont::Impl::~Impl()
 
 TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode, wchar_t nextCharCode) const
 {
-	OSStatus status;
+	QPainter painter();
+	painter
+
 
 	UniChar subString[2];
 	subString[0] = charcode;
@@ -86,18 +141,28 @@ namespace
 
 void appDrawChar(TRasterGR8P &outImage, TFont::Impl *pimpl, wchar_t charcode)
 {
-	OSStatus status;
-	UniChar subString[2];
-	subString[0] = charcode;
-	subString[1] = 0;
-	UniCharCount length = sizeof(subString) / sizeof(UniChar);
+	QImage qimage(70, 70, QImage::Format_ARGB32);
+	wchar_t wchararray[1] = {charcode};
+	auto dbgstr = QString::fromWCharArray(wchararray);
+	std::wstring wstr = {charcode};
+	dbgstr = QString::fromStdWString(wstr);
+	QPainter painter(&qimage);
+	painter.fillRect(qimage.rect(), Qt::white);
+	painter.drawText(qimage.rect(), Qt::AlignCenter, QString::fromStdWString(wstr));
+	painter.end();
 
-	TPixelGR8 bgp;
-	bgp.value = 255;
-	outImage->fill(bgp);
-	void *data = outImage->getRawData();
+//	const QVector<QRgb> colortable = {qRgb(255,255,255), qRgb(0, 0, 0)};
+//	QImage qimage8 = qimage.convertToFormat(QImage::Format_Indexed8, colortable);
+	QImage qimage8 = qimage.convertToFormat(QImage::Format_Indexed8, Qt::MonoOnly);
 
-	CGColorSpaceRef grayColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericGray);
+//	QLabel* lbl = new QLabel();
+//	lbl->setPixmap(QPixmap::fromImage(qimage8));
+//	lbl->show();
+
+	outImage = TRasterGR8P(70,70);
+	TRasterP rimage = rasterFromQImage(qimage8);
+	outImage = TRasterGR8P(rimage);
+	outImage->getLx();
 }
 }
 //-----------------------------------------------------------------------------
@@ -131,6 +196,7 @@ TPoint TFont::drawChar(TRasterCM32P &outImage, TPoint &unused, int inkId, wchar_
 		TPixelCM32 *tarPix = outImage->pixels(ty);
 		for (int x = 0; x < lx; ++x) {
 			int tone = srcPix->value;
+			std::cout<<tone;
 
 			if (tone == 255)
 				*tarPix = bgColor;
