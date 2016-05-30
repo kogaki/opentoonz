@@ -118,7 +118,7 @@ TFont::Impl::~Impl()
 //-----------------------------------------------------------------------------
 
 
-TStroke convertPointsToStroke(std::vector<TThickPoint> points){
+TStroke* convertPointsToStroke(std::vector<TThickPoint> points){
 	TStroke *stroke = new TStroke();
 	// to close loop
 	TThickPoint lastPoint = points.back();
@@ -136,11 +136,11 @@ TStroke convertPointsToStroke(std::vector<TThickPoint> points){
 
 	stroke->reshape(&(points[0]), points.size());
 	stroke->setSelfLoop(true);
-	return *stroke;
+	return stroke;
 }
 
-std::vector<TStroke> convertQPainterPathToStrokes(const QPainterPath pathes){
-	std::vector<TStroke> strokes;
+std::vector<TStroke*> convertQPainterPathToStrokes(const QPainterPath pathes){
+	std::vector<TStroke*> strokes;
 	std::vector<TThickPoint> points;
 	for(int i=0; i<pathes.elementCount(); i++){
 		auto element = pathes.elementAt(i);
@@ -166,63 +166,20 @@ TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode, wchar_t nextCharC
 	auto qstr = QString::fromWCharArray(wchararray);
 	pathes.addText(10, 30, m_pimpl->m_qfont, qstr);
 
-	QImage qimage(70, 70, QImage::Format_ARGB32);
-	QPainter painter(&qimage);
-	painter.fillRect(qimage.rect(), Qt::white);
-	painter.drawPath(pathes);
-	painter.end();
-	QLabel* lbl = new QLabel();
-	lbl->setPixmap(QPixmap::fromImage(qimage));
-	lbl->show();
+//	QImage qimage(70, 70, QImage::Format_ARGB32);
+//	QPainter painter(&qimage);
+//	painter.fillRect(qimage.rect(), Qt::white);
+//	painter.drawPath(pathes);
+//	painter.end();
+//	QLabel* lbl = new QLabel();
+//	lbl->setPixmap(QPixmap::fromImage(qimage));
+//	lbl->show();
 
-
-
-//	std::vector<TStroke> strokes;
-//	std::vector<TThickPoint> points;
-//	for(int i=0; i<pathes.elementCount(); i++){
-//		auto element = pathes.elementAt(i);
-//		TThickPoint point = TThickPoint(element.x, element.y, 0);
-//		if(element.isMoveTo()){ // stroke start
-//			if(!points.empty()){
-//				strokes.push_back(convertPointsToStroke(points));
-//			}
-//			points.clear();
-//		}
-//		points.push_back(point);
-//	}
-//	if(!points.empty()){
-//		strokes.push_back(convertPointsToStroke(points));
-//	}
-//
-//
-	std::vector<TThickPoint> points;
-	points.clear();
-	for(int i=0; i<pathes.elementCount(); i++){
-		auto element = pathes.elementAt(i);
-		TThickPoint startPoint = TThickPoint(element.x, element.y, 0);
-		points.push_back(startPoint);
+	for(auto stroke: convertQPainterPathToStrokes(pathes)){
+		image->addStroke(stroke);
 	}
 
-	// to close loop
-	TThickPoint lastPoint = points.back();
-	TThickPoint firstPoint = points.front();
-	if(!isAlmostZero(lastPoint.x - firstPoint.x) || !isAlmostZero(lastPoint.y - firstPoint.y)){
-		points.push_back((lastPoint + firstPoint) * 0.5);
-		points.push_back(firstPoint);
-	}
-
-	TStroke *stroke = new TStroke();
-	stroke->reshape(&(points[0]), points.size());
-	stroke->setSelfLoop(true);
-//
-//	for(auto stroke: convertQPainterPathToStrokes(pathes)){
-//		image->addStroke(&stroke);
-//		break;
-//	}
-
-	image->addStroke(stroke);
-	image->group(0, image->getStrokeCount());
-
+//	image->group(0, image->getStrokeCount());
 	image->transform(TScale(1, -1));
 	image->group(0, image->getStrokeCount());
 
