@@ -1592,7 +1592,7 @@ void TStroke::reshape(const TThickPoint pos[], int count)
 {
 	// count deve essere dispari e maggiore o uguale a tre
 	assert(count >= 3);
-	assert(count & 1);
+	assert(count % 2 == 1);
 	QuadStrokeChunkArray &chunkArray = m_imp->m_centerLineArray;
 	clearPointerContainer(chunkArray);
 
