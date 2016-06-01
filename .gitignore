@@ -9,6 +9,7 @@ GeneratedFiles
 *.suo
 *.user
 build*
+.DS_Store
 
 # bundled thirdparty libraries
 /thirdparty/lzo

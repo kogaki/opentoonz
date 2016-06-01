@@ -118,7 +118,7 @@ set(HEADERS ${MOC_HEADERS}
     ../include/t32bitsrv_wrap.h
     ../include/tenv.h
     ../include/tmeshimage.h
-    ../include/tgldisplaylistsmanager.h)
+    ../include/tgldisplaylistsmanager.h ../include/tvrender/qimageutil.h)
 
 set(SOURCES
     ../common/tcore/tdata.cpp
@@ -240,7 +240,7 @@ set(SOURCES
     ../common/tsystem/tsystempd.cpp
     ../common/tapptools/tenv.cpp
     ../common/tmeshimage/tmeshimage.cpp
-    ../common/tmsgcore.cpp)
+    ../common/tmsgcore.cpp ../common/tvrender/qtimageutil.cpp)
 
 if(WIN32)
     set(SOURCES ${SOURCES}

@@ -57,9 +57,6 @@ private:
 	TFont(const LOGFONTW &, HDC hdc);
 #else
 	TFont(QFont* qfont);
-	QImage DVAPI rasterToQImage(const TRasterP &ras, bool premultiplied = true, bool mirrored = true);
-//	TRaster32P DVAPI rasterFromQImage(QImage image, bool premultiply = true, bool mirror = true);
-	TRasterP rasterFromQImage(const QImage &image);
 #endif
 
 public:
