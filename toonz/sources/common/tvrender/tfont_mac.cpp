@@ -17,6 +17,8 @@
 
 #include <QFont>
 #include <QfontDatabase>
+#include <QFontMetrics>
+
 #include <QPainter>
 #include <QLabel>
 #include <QWidget>
@@ -31,7 +33,6 @@ struct TFont::Impl {
 	Fixed m_size;
 	int m_ascender;
 	int m_descender;
-
 	Impl(QFont* qfont);
 	~Impl();
 };
@@ -55,10 +56,6 @@ TFont::~TFont()
 TFont::Impl::Impl(QFont* qfont)
 	: m_size(0), m_qfont(*qfont)
 {
-	OSStatus status;
-
-	long response;
-	ByteCount sizes[2];
 }
 
 //-----------------------------------------------------------------------------
@@ -182,20 +179,25 @@ TPoint TFont::drawChar(TRasterCM32P &outImage, TPoint &unused, int inkId, wchar_
 	return getDistance(charcode, nextCharCode);
 }
 
-//-----------------------------------------------------------------------------
 
+// distance between start points of two glyphs
 TPoint TFont::getDistance(wchar_t firstChar, wchar_t secondChar) const
 {
-	OSStatus status;
-	UniChar subString[2];
-	subString[0] = firstChar;
-	subString[1] = secondChar;
-	UniCharCount length = sizeof(subString) / sizeof(UniChar);
-	ItemCount numGlyphs;
-
-	assert(numGlyphs >= 2);
-
-	return TPoint(1, 0);
+//	OSStatus status;
+//	UniChar subString[2];
+//	subString[0] = firstChar;
+//	subString[1] = secondChar;
+//	UniCharCount length = sizeof(subString) / sizeof(UniChar);
+//	ItemCount numGlyphs;
+//	assert(numGlyphs >= 2);
+//	return TPoint(1, 0);
+	QFontMetrics fontMetrics(m_pimpl->m_qfont);
+	std::wstring firstString = {firstChar};
+	std::wstring secondString = {secondChar};
+	auto secondRect = fontMetrics.tightBoundingRect(QString::fromStdWString(secondString));
+	auto bothRect = fontMetrics.tightBoundingRect(QString::fromStdWString(firstString+secondString));
+	auto distance = bothRect.width()-secondRect.width();
+	return TPoint(distance, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +252,6 @@ struct TFontManager::Impl {
 	bool m_loaded;
 	TFont *m_currentFont;
 	QFont *m_currentQFont;
-//	QString m_currentFamily;
 	wstring m_currentTypeface;
 	int m_size;
 
@@ -259,8 +260,6 @@ struct TFontManager::Impl {
 	{
 	}
 
-//	bool setFontName(ATSUFontID fontId, int platform, int script, int lang);
-//	bool addFont(ATSUFontID);
 	void loadFontNames();
 	bool setFont(std::wstring family);
 };
@@ -275,9 +274,7 @@ void TFontManager::Impl::loadFontNames()
 bool TFontManager::Impl::setFont(std::wstring family)
 {
 	for(const QString eachFamily: m_database.families()){
-		auto famstr = eachFamily.toStdWString();
 		if(eachFamily.toStdWString() == family){
-//			m_currentFamily = eachFamily;
 			m_currentQFont = new QFont(eachFamily);
 			m_currentFont = new TFont(m_currentQFont);
 			for(const QString eachStyle: m_database.styles(eachFamily)){
