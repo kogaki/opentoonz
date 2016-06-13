@@ -70,9 +70,9 @@ TFont::Impl::~Impl()
 TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode, wchar_t nextCharCode) const
 {
     QPainterPath pathes;
-//    wchar_t wchararray[1] = {charcode};
-//	auto qstr = QString::fromWCharArray(wchararray);
-	auto qstr = QString::fromWCharArray(L"ウ");
+    wchar_t wchararray[1] = {charcode};
+	auto qstr = QString::fromWCharArray(wchararray);
+//	auto qstr = QString::fromWCharArray(L"ウ");
 	pathes.addText(10, 30, m_pimpl->m_qfont, qstr);
 
 //	QImage qimage(70, 70, QImage::Format_ARGB32);
