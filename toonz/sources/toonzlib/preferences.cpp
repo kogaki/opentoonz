@@ -539,6 +539,9 @@ Preferences::Preferences()
            m_paletteTypeOnLoadRasterImageAsColorModel);
   getValue(*m_settings, "showKeyframesOnXsheetCellArea",
            m_showKeyframesOnXsheetCellArea);
+  QString ffmpegPath = m_settings->value("ffmpegPath").toString();
+  if (ffmpegPath != "") m_ffmpegPath = ffmpegPath;
+  setFfmpegPath(m_ffmpegPath.toStdString());
 }
 
 //-----------------------------------------------------------------
@@ -1175,6 +1178,14 @@ void Preferences::setDefLevelDpi(double dpi) {
 void Preferences::setPaletteTypeOnLoadRasterImageAsColorModel(int type) {
   m_paletteTypeOnLoadRasterImageAsColorModel = type;
   m_settings->setValue("paletteTypeOnLoadRasterImageAsColorModel", type);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setFfmpegPath(std::string path) {
+	m_ffmpegPath = QString::fromStdString(path);
+	std::string strPath = m_ffmpegPath.toStdString();
+	m_settings->setValue("ffmpegPath", m_ffmpegPath);
 }
 
 //-----------------------------------------------------------------
