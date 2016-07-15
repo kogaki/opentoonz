@@ -11,7 +11,7 @@
 #include <QProcess>
 #include <QStringList>
 #include <QDir>
-#include <QImage>
+#include <QtGui/QImage>
 #include "tiio_ffmpeg.h"
 #include "toonz/preferences.h"
 

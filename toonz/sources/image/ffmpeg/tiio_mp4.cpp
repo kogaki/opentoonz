@@ -7,8 +7,8 @@
 #include "tsound.h"
 #include <QStringList>
 #include <QDir>
-#include <QImage>
-
+#include <QtGui/QImage>
+#include <QProcess>
 
 
 //===========================================================
